@@ -1,21 +1,22 @@
+package controller;
+
 import java.util.Scanner;
+import model.Command;
+import model.CommandWords;
 
 public class Parser {
-    private CommandWords commands;
+    private CommandWords commands = new CommandWords();
     private Scanner reader;
 
     public Parser() {
-        commands = new CommandWords();
-        reader = new Scanner(System.in);
+        this.reader = new Scanner(System.in);
     }
 
     public Command getCommand() {
         System.out.print("> ");
-        String inputLine = reader.nextLine();
-
+        String inputLine = this.reader.nextLine();
         String word1 = null;
         String word2 = null;
-
         Scanner tokenizer = new Scanner(inputLine);
         if (tokenizer.hasNext()) {
             word1 = tokenizer.next();
@@ -24,14 +25,10 @@ public class Parser {
             }
         }
 
-        if (commands.isCommand(word1)) {
-            return new Command(word1, word2);
-        } else {
-            return new Command(null, word2);
-        }
+        return this.commands.isCommand(word1) ? new Command(word1, word2) : new Command((String)null, word2);
     }
 
-    public void showCommands() {
-        commands.showAll();
+    public CommandWords getCommandWords() {
+        return this.commands;
     }
 }

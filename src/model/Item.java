@@ -1,3 +1,5 @@
+package model;
+
 public class Item {
     private String description;
     private String name;
@@ -12,7 +14,7 @@ public class Item {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -20,7 +22,7 @@ public class Item {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -28,7 +30,7 @@ public class Item {
     }
 
     public String getLocation() {
-        return location;
+        return this.location;
     }
 
     public void setLocation(String location) {
@@ -36,7 +38,7 @@ public class Item {
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(int id) {
@@ -44,10 +46,10 @@ public class Item {
     }
 
     public boolean isVisible() {
-        return isVisible;
+        return this.isVisible;
     }
 
     public void setVisible(boolean visible) {
-        isVisible = visible;
+        this.isVisible = visible;
     }
 }
