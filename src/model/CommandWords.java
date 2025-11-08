@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandWords {
-    private Map<String, String> validCommands = new HashMap();
+    private Map<String, String> validCommands = new HashMap<>();
 
     public CommandWords() {
         this.validCommands.put("go", "Move to another room");
@@ -16,7 +16,11 @@ public class CommandWords {
         this.validCommands.put("inventory", "List current inventory");
         this.validCommands.put("take", "Pick up an item");
         this.validCommands.put("drop", "Drop the item");
+        this.validCommands.put("mark", "Mark the room");
+        this.validCommands.put("time", "Show elapsed time in seconds");
+        this.validCommands.put("turns", "Show number of turns taken");
     }
+
 
     public boolean isCommand(String commandWord) {
         return this.validCommands.containsKey(commandWord);

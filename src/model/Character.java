@@ -2,11 +2,14 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import model.rooms.Room;
+import model.rooms.EndRoom;
+import model.rooms.SpinnerRoom;
 
 public class Character {
     private String name;
     private Room currentRoom;
-    private List<Item> inventory = new ArrayList();
+    private List<Item> inventory = new ArrayList<>();
 
     public Character(String name, Room startingRoom) {
         this.name = name;
