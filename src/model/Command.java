@@ -1,3 +1,5 @@
+package model;
+
 public class Command {
     private String commandWord;
     private String secondWord;
@@ -8,18 +10,18 @@ public class Command {
     }
 
     public String getCommandWord() {
-        return commandWord;
+        return this.commandWord;
     }
 
     public String getSecondWord() {
-        return secondWord;
+        return this.secondWord;
     }
 
     public boolean isUnknown() {
-        return commandWord == null;
+        return this.commandWord == null;
     }
 
     public boolean hasSecondWord() {
-        return secondWord != null;
+        return this.secondWord != null;
     }
 }
