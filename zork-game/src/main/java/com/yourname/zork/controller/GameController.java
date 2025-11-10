@@ -3,14 +3,14 @@ package controller;
 import model.Character;
 import model.Command;
 import model.CommandWords;   
-import model.Item;
-import model.rooms.Room;
-import model.rooms.SpinnerRoom;
-import model.rooms.EndRoom;
+import model.items.*;
+import model.rooms.*;
 import model.ZorkUL;
 import model.GameTimer;
 import model.GameContext;
 import model.TurnManager;
+import model.Direction;
+import model.Region;
 import view.ConsoleView;
 
 public class GameController implements GameContext{
@@ -37,7 +37,7 @@ public class GameController implements GameContext{
 
         Command command;
         for(boolean finished = false; !finished; finished = this.processCommand(command)) {
-            command = this.parser.getCommand();
+            command = this.parser.getCommand(this);
         }
 
         view.showMessage("Thank you for playing. Goodbye.");
@@ -48,10 +48,10 @@ public class GameController implements GameContext{
     private void openChest() {}
 
     private void printWelcome() {
-        view.showMessage();
+        view.showBlankLine();
         view.showMessage("Welcome to DeliveryDash!");
         view.showMessage("Type 'help' if you need help.");
-        view.showMessage();
+        view.showBlankLine();
         this.player.getCurrentRoom().onEnter(this);
     }
 
@@ -78,7 +78,7 @@ public class GameController implements GameContext{
             }
             switch (commandWord) {
                 case "inventory":
-                    player.listItems();
+                    player.listItems(this);
                     break;
                 case "help":
                     printHelp();
@@ -104,14 +104,14 @@ public class GameController implements GameContext{
                 case "drop":
                     removeItem(command);
                     break;
-                case "mark":
-                    markRoom(command);
-                    break;
                 case "time":
                     view.showMessage("Time elapsed: " + timer.getSecondsElapsed() + " seconds.");
                     break;
                 case "turns":
                     view.showMessage("Turns taken: " + turnManager.getTurnCount() + ".");
+                    break;
+                case "use":
+                    useItem(command);
                     break;
                 default:
                     view.showMessage("I don't know what you mean...");
@@ -121,6 +121,26 @@ public class GameController implements GameContext{
             return false;
         }
     }
+
+    private void useItem(Command command) {
+        if (!command.hasSecondWord()) {
+            view.showMessage("Use what?");
+            return;
+        }
+
+        String itemName = command.getSecondWord();
+        Item item = player.getItemFromInventory(itemName);
+
+        if (item == null) {
+            view.showMessage("You don't have a '" + itemName + "'.");
+            return;
+        }
+
+
+        //polymorphic use item call
+        item.use(this, player);
+    }
+
 
     private void takeItem(Command command) {
         if (!command.hasSecondWord()) {
@@ -147,7 +167,7 @@ public class GameController implements GameContext{
 
     }
 
-    public void removeItem(Command command) {
+    private void removeItem(Command command) {
         if (!command.hasSecondWord()) {
             view.showMessage("Drop what?");
             return;
@@ -169,36 +189,71 @@ public class GameController implements GameContext{
             view.showMessage("Go where?");
             return;
         } 
-        String direction = command.getSecondWord();
+        String directionWord = command.getSecondWord();
+        Direction direction;
+        try {
+            direction = Direction.fromString(directionWord);
+        } catch (model.InvalidDirectionException e) {
+            view.showMessage(e.getMessage());
+            return;
+        }
+
         Room current = this.player.getCurrentRoom();
-        Room nextRoom = current.getExit(direction);
+        Room nextRoom = current.getExit(direction.getText());
 
         if (nextRoom == null) {
             view.showMessage("There is no door!");
             return;
         }
+        if (current.isExitLocked(direction.getText())) {
+            view.showMessage("A locked gate blocks your way to the " + direction.getText() + ".");
+            return;
+        }
+
+        Region fromRegion = current.getRegion();
+        Region toRegion   = nextRoom.getRegion();
+
         this.player.setCurrentRoom(nextRoom);
+
+        // region change
+        if (fromRegion != toRegion) {
+            showRegionTransition(fromRegion, toRegion);
+        }
 
         // polymorphic call to onEnter
         nextRoom.onEnter(this);
      
     }
     
-
-    public void markRoom(Command command) {
-        Room currentRoom = player.getCurrentRoom();
-        if (currentRoom.isMarked()) {
-            view.showMessage("This room is already marked with chalk.");
-        } else {
-            currentRoom.mark(command.getSecondWord());
-            view.showMessage("You have marked this room with chalk with the message " + command.getSecondWord() + ".");
+    private void showRegionTransition(Region from, Region to) {
+        switch (to) {
+            case STREETS:
+                view.showMessage("You leave the warm glow of the takeaway and step out onto the street.");
+                break;
+            case PARK:
+                view.showMessage("You leave the busy street behind and enter the quiet park.");
+                break;
+            case ESTATE:
+                view.showMessage("You step into the estate. Rows of identical houses close in around you.");
+                break;
+            case TAKEAWAY:
+                view.showMessage("You head back towards the familiar smell of fried food.");
+                break;
         }
     }
 
     // GameContext methods for encapuslation
     @Override
+    public void showBlankLine() {
+        view.showBlankLine();
+    }
+    @Override
     public void showMessage(String message) {
         view.showMessage(message);
+    }
+    @Override
+    public void showMessagePrint(String message) {
+        view.showMessagePrint(message);
     }
     @Override
     public int getSecondsElapsed() {
@@ -211,6 +266,10 @@ public class GameController implements GameContext{
     @Override
     public void markFinalRoom() {
         finalRoom = true;
+    }
+    @Override
+    public boolean keyInInventory() {
+        return player.hasItem("Key");
     }
 
 }

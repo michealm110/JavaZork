@@ -1,5 +1,15 @@
-*.class
+# maven build directory
+target/
 
-repomix-output.xml
+# maven release plugin files
+release.properties
 
 .vscode/
+
+# java build files
+*.class
+*.jar
+*.war
+*.ear
+
+repomix-output.xml

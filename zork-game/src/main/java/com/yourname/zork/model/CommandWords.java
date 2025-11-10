@@ -16,9 +16,9 @@ public class CommandWords {
         this.validCommands.put("inventory", "List current inventory");
         this.validCommands.put("take", "Pick up an item");
         this.validCommands.put("drop", "Drop the item");
-        this.validCommands.put("mark", "Mark the room");
         this.validCommands.put("time", "Show elapsed time in seconds");
         this.validCommands.put("turns", "Show number of turns taken");
+        this.validCommands.put("use", "Use an item from inventory");
     }
 
 

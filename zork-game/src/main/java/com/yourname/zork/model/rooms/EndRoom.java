@@ -1,11 +1,12 @@
 package model.rooms;
 
 import model.GameContext;
+import model.Region;
 
 public class EndRoom extends Room {
 
-    public EndRoom(String description) {
-        super(description);
+    public EndRoom(String description, Region region) {
+        super(description, region);
     }
 
     @Override

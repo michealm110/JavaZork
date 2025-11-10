@@ -2,9 +2,10 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-import model.rooms.Room;
-import model.rooms.EndRoom;
-import model.rooms.SpinnerRoom;
+import model.rooms.*;
+import model.items.*;
+import model.GameContext;
+
 
 public class Character {
     private String name;
@@ -42,27 +43,32 @@ public class Character {
         return null;
     }
 
-    public void listItems() {
+    public Item getItemFromInventory(String itemName) {
+        for (Item item : inventory) {
+            if (item.getName().equalsIgnoreCase(itemName)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public void listItems(GameContext game) {
         if (inventory.isEmpty()) {
-            System.out.println("Your inventory is currently empty.");
+            game.showMessage("Your inventory is currently empty.");
         } else {
             int i = 1;
             for (Item item : inventory) {
-                System.out.println(i + ". " + item.getName());
+                game.showMessage(i + ". " + item.getName());
                 i++;
             }
         }
-
     }
-
-    public void move(String direction) {
-        Room nextRoom = this.currentRoom.getExit(direction);
-        if (nextRoom != null) {
-            this.currentRoom = nextRoom;
-            System.out.println("You moved to: " + this.currentRoom.getDescription());
-        } else {
-            System.out.println("You can't go that way!");
+    public boolean hasItem(String itemName) {
+        for (Item item : inventory) {
+            if (item.getName().equalsIgnoreCase(itemName)) {
+                return true;
+            }
         }
-
+        return false;
     }
 }

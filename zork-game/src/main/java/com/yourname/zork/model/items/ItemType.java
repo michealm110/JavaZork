@@ -1,0 +1,6 @@
+package model.items;
+
+public enum ItemType {
+    KEY,
+    CHALK
+}

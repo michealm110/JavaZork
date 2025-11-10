@@ -8,10 +8,13 @@ public class ConsoleView {
         }
         System.out.println();
     }
-    public void showMessage() {
+    public void showBlankLine() {
         System.out.println();
     }
     public void showMessage(String message) {
         System.out.println(message);
+    }
+    public void showMessagePrint(String message) {
+        System.out.print(message);
     }
 }

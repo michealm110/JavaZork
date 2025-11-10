@@ -5,19 +5,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
-import model.Item;
+import model.items.*;
 import model.GameContext;
+import model.Region;
 
 public class Room {
     private List<Item> items = new ArrayList<>();
     private String description;
     private Map<String, Room> exits;
+    private Map<String, Boolean> lockedExits;
     private boolean isMarked = false;
     private String chalkMarking;
+    private Region region;
 
-    public Room(String description) {
+    public Room(String description, Region region) {
         this.description = description;
+        this.region = region;
         this.exits = new HashMap<>();
+        this.lockedExits = new HashMap<>();
+    }
+
+    public Region getRegion() {
+        return this.region;
     }
 
     public void addItem(Item item) {
@@ -60,6 +69,18 @@ public class Room {
         this.exits.put(direction, neighbor);
     }
 
+    public void setLockedExit(String direction) {
+        this.lockedExits.put(direction, true);
+    } 
+
+    public boolean isExitLocked(String direction) {
+        return this.lockedExits.getOrDefault(direction, false);
+    }
+
+    public void unlockExit(String direction) {
+        this.lockedExits.put(direction, false);
+    }
+
     public Room getExit(String direction) {
         return (Room)this.exits.get(direction);
     }
@@ -77,19 +98,18 @@ public class Room {
     public String getLongDescription() {
         String var10000 = this.description; 
         String defaultMessage = "You are " + var10000 + ".\nExits: " + this.getExitString() + "\n" + this.getItemString();
-        if (isMarked) {
-            return defaultMessage += "\nThis room is marked with chalk that reads: " + chalkMarking;
+        if (this.isMarked) {
+            return defaultMessage += "\nThis room is marked with chalk";
         }
         return defaultMessage;
     }
 
-    public void mark(String chalkMarking) {
-        this.chalkMarking = chalkMarking;
-        isMarked = true;
+    public void markWithChalk() {
+        this.isMarked = true;
     }
 
-    public boolean isMarked() {
-        return isMarked;
+    public boolean hasChalkMark() {
+        return this.isMarked;
     }
 
     // polymorphic onEnter method
