@@ -10,28 +10,31 @@ import model.GameContext;
 import model.Region;
 
 public class Room {
-    private List<Item> items = new ArrayList<>();
+    
+    private String id;
+    private String name;
     private String description;
-    private Map<String, Room> exits;
-    private Map<String, Boolean> lockedExits;
     private boolean isMarked = false;
     private String chalkMarking;
-    private Region region;
+    private Map<String, Room> exits;
+    private List<Item> items;
+    //private Region region;
 
-    public Room(String description, Region region) {
+    public Room(String id, String name, String description) {
+        this.id = id;
+        this.name = name;
         this.description = description;
-        this.region = region;
         this.exits = new HashMap<>();
-        this.lockedExits = new HashMap<>();
+        this.items = new ArrayList<>();
     }
 
-    public Region getRegion() {
-        return this.region;
-    }
+    //public Region getRegion() {
+    //    return this.region;
+    //}
+    public String getId() { return this.id; }
+    public String getName() { return this.name; }
 
-    public void addItem(Item item) {
-        this.items.add(item);
-    }
+    public void addItem(Item item) { this.items.add(item); }
 
     public Item removeItemByName(String name) {
         for (Item item : items) {
@@ -96,8 +99,8 @@ public class Room {
     }
 
     public String getLongDescription() {
-        String var10000 = this.description; 
-        String defaultMessage = "You are " + var10000 + ".\nExits: " + this.getExitString() + "\n" + this.getItemString();
+        String description = this.description; 
+        String defaultMessage = "You are " + description + ".\nExits: " + this.getExitString() + "\n" + this.getItemString();
         if (this.isMarked) {
             return defaultMessage += "\nThis room is marked with chalk";
         }

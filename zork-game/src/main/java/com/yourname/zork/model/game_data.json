@@ -1,0 +1,172 @@
+{
+  "startingRoom": "room_takeaway_front",
+  "rooms": [
+    {
+      "id": "room_takeaway_front",
+      "name": "Outside Kingly Kebab",
+      "description": "You are outside the front door of Kingly Kebab, neon light spilling onto the wet pavement.",
+      "exits": {
+        "south": "room_staff_alley",
+        "east": "room_main_street_west"
+      }
+    },
+    {
+      "id": "room_staff_alley",
+      "name": "Staff Alley",
+      "description": "You are in the narrow staff alley behind the takeaway. Bins, crates, and the smell of old chips.",
+      "exits": {
+        "north": "room_takeaway_front",
+        "east": "room_stock_room"
+      }
+    },
+    {
+      "id": "room_stock_room",
+      "name": "Stock Room",
+      "description": "You are in the cramped stock room: boxes of sauces, spare menus, and random junk piled everywhere.",
+      "exits": {
+        "west": "room_staff_alley"
+      },
+      "items": [
+        {
+          "id": "item_key",
+          "name": "Key",
+          "desc": "A large golden key with ‘CL’ scratched into it. It probably opens something in the estate.",
+          "portable": "true",
+          "type": "KEY"
+        }
+      ]
+    },
+    {
+      "id": "room_main_street_west",
+      "name": "Main Street West",
+      "description": "You are on Main Street West. Shuttered shops and parked cars line the road.",
+      "exits": {
+        "west": "room_takeaway_front",
+        "east": "room_main_street_east"
+      }
+    },
+    {
+      "id": "room_main_street_east",
+      "name": "Main Street East",
+      "description": "You are on Main Street East, closer to the estates. An off-licence hums with low music nearby.",
+      "exits": {
+        "west": "room_main_street_west",
+        "north": "room_park_entrance",
+        "south": "room_estate_entrance"
+      }
+    },
+    {
+      "id": "room_park_entrance",
+      "name": "Park Entrance",
+      "description": "You are at the entrance to a dimly lit park. Trees arch overhead and a path winds into the darkness.",
+      "exits": {
+        "south": "room_main_street_east",
+        "north": "room_dark_park"
+      }
+    },
+    {
+      "id": "room_dark_park",
+      "name": "Dark Park",
+      "description": "You are deep in the park. It’s so dark that without extra light you feel like you could get lost.",
+      "exits": {
+        "south": "room_park_entrance"
+      },
+      "items": [
+        {
+          "id": "item_chalk",
+          "name": "Chalk",
+          "desc": "A stub of white chalk. Perfect for marking walls so you don’t get lost.",
+          "portable": "true",
+          "type": "CHALK"
+        }
+      ]
+    },
+    {
+      "id": "room_estate_entrance",
+      "name": "Estate Entrance",
+      "description": "You are at the entrance to Crooked Lane estate. Identical houses sprawl in every direction.",
+      "exits": {
+        "north": "room_main_street_east",
+        "east": "room_twisty_junction"
+      }
+    },
+    {
+      "id": "room_twisty_junction",
+      "name": "Twisty Junction",
+      "description": "You are at a junction of narrow estate roads. Every corner looks weirdly similar.",
+      "exits": {
+        "west": "room_estate_entrance",
+        "north": "room_north_street",
+        "south": "room_south_street"
+      }
+    },
+    {
+      "id": "room_north_street",
+      "name": "North Street",
+      "description": "You are on a silent residential street. The same type of semi-detached houses repeat endlessly.",
+      "exits": {
+        "south": "room_twisty_junction",
+        "east": "room_deep_street"
+      }
+    },
+    {
+      "id": "room_deep_street",
+      "name": "Deep Street",
+      "description": "You are on a deeper stretch of road in the estate. It feels like you are further from civilisation.",
+      "exits": {
+        "west": "room_north_street",
+        "south": "room_dizzy_street"
+      }
+    },
+    {
+      "id": "room_dizzy_street",
+      "name": "Dizzy Street",
+      "description": "You are at a strange corner where the houses seem to shift when you’re not looking.",
+      "exits": {
+        "north": "room_deep_street",
+        "south": "room_shadow_alley"
+      }
+    },
+    {
+      "id": "room_shadow_alley",
+      "name": "Shadow Alley",
+      "description": "You are in a narrow alley between houses. It’s quiet, and you see your shadow in each window.",
+      "exits": {
+        "north": "room_dizzy_street"
+      }
+    },
+    {
+      "id": "room_south_street",
+      "name": "South Street",
+      "description": "You are on a street ending at a tall metal gate to the south. A small sign reads ‘Private walkway’.",
+      "exits": {
+        "north": "room_twisty_junction",
+        "south": "room_garden_path"
+      },
+      "lockedExits": {
+        "south": {
+          "key": "item_key",
+          "msg": "The tall metal gate is locked. The golden key marked 'CL' might open it."
+        }
+      }
+    },
+    {
+      "id": "room_garden_path",
+      "name": "Garden Path",
+      "description": "You are on a narrow garden path that winds behind the houses. A single house light glows ahead.",
+      "exits": {
+        "north": "room_south_street",
+        "east": "room_customer_house"
+      }
+    },
+    {
+      "id": "room_customer_house",
+      "name": "Customer's House",
+      "description": "You are outside No. 14 Crooked Lane, your customer’s house. Warm light spills from behind the curtains.",
+      "exits": {
+        "west": "room_garden_path"
+      }
+    }
+  ],
+  "npcs": []
+}
