@@ -4,6 +4,7 @@ import model.Character;
 import model.WorldBuilder;
 import model.GameTimer;   
 import model.TurnManager; 
+import model.rooms.Room;
 import view.ConsoleView;  
           
 
@@ -15,10 +16,12 @@ public class GameApp {
         Parser parser = new Parser();
         ConsoleView view = new ConsoleView();
 
-        Character player = WorldBuilder.createPlayerAndWorld();
+        WorldBuilder worldBuilder = new WorldBuilder();
+        Room startingRoom = worldBuilder.load("game_data.json");
 
+        Character player = new Character("Player", startingRoom);
         GameController game = new GameController(player, parser, view, turnManager, timer);
-        
+
         game.startGame();
     }
 }

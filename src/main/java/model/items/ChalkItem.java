@@ -5,8 +5,8 @@ import model.Character;
 import model.rooms.Room;
 
 public class ChalkItem extends Item {
-    public ChalkItem(String name, String description) {
-        super(name, description, ItemType.CHALK);
+    public ChalkItem(String id, String name, String description) {
+        super(id, name, description, true, ItemType.CHALK);
     }
 
     public void use(GameContext context, Character player) {

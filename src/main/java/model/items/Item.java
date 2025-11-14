@@ -1,18 +1,16 @@
 package model.items;
 
-import model.GameContext;
-import model.Character;
-
-public abstract class Item {
+//we'll get to polymorphism later
+public class Item {
     private String id;
     private String name;
     private String description;
     private boolean isPortable;
     private final ItemType type;
 
-    public Item(String id, String name, String description, ItemType type) {
+    public Item(String id, String name, String description, boolean isPortable, ItemType type) {
         this.id = id;
-        this.isPortable = true;
+        this.isPortable = isPortable;
         this.name = name;
         this.description = description;
         this.type = type;

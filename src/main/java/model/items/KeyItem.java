@@ -7,8 +7,8 @@ import model.rooms.Room;
 
 public class KeyItem extends Item {
 
-    public KeyItem(String name, String description) {
-        super(name, description, ItemType.KEY);
+    public KeyItem(String id, String name, String description) {
+        super(id, name, description, true, ItemType.KEY);
     }
 
     public void use(GameContext game, Character player) {

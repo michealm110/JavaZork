@@ -138,7 +138,7 @@ public class GameController implements GameContext{
 
 
         //polymorphic use item call
-        item.use(this, player);
+        //item.use(this, player);
     }
 
 
@@ -210,15 +210,15 @@ public class GameController implements GameContext{
             return;
         }
 
-        Region fromRegion = current.getRegion();
-        Region toRegion   = nextRoom.getRegion();
+        //Region fromRegion = current.getRegion();
+        //Region toRegion   = nextRoom.getRegion();
 
         this.player.setCurrentRoom(nextRoom);
 
         // region change
-        if (fromRegion != toRegion) {
-            showRegionTransition(fromRegion, toRegion);
-        }
+        //if (fromRegion != toRegion) {
+        //    showRegionTransition(fromRegion, toRegion);
+        //}
 
         // polymorphic call to onEnter
         nextRoom.onEnter(this);

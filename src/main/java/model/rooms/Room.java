@@ -10,13 +10,13 @@ import model.GameContext;
 import model.Region;
 
 public class Room {
-    
+
     private String id;
     private String name;
     private String description;
     private boolean isMarked = false;
     private String chalkMarking;
-    private Map<String, Room> exits;
+    private Map<String, Exit> exits;
     private List<Item> items;
     //private Region region;
 
@@ -68,24 +68,21 @@ public class Room {
         return this.description;
     }
 
-    public void setExit(String direction, Room neighbor) {
-        this.exits.put(direction, neighbor);
+    public void setExit(String direction, Exit exit) {
+        this.exits.put(direction, exit);
     }
 
-    public void setLockedExit(String direction) {
-        this.lockedExits.put(direction, true);
-    } 
-
     public boolean isExitLocked(String direction) {
-        return this.lockedExits.getOrDefault(direction, false);
+        return this.exits.get(direction).isLocked();
     }
 
     public void unlockExit(String direction) {
-        this.lockedExits.put(direction, false);
+        this.exits.get(direction).unlock();
     }
 
     public Room getExit(String direction) {
-        return (Room)this.exits.get(direction);
+        
+        return this.exits.get(direction).getTargetRoom();
     }
 
     public String getExitString() {
@@ -99,7 +96,7 @@ public class Room {
     }
 
     public String getLongDescription() {
-        String description = this.description; 
+        String description = this.description;
         String defaultMessage = "You are " + description + ".\nExits: " + this.getExitString() + "\n" + this.getItemString();
         if (this.isMarked) {
             return defaultMessage += "\nThis room is marked with chalk";
@@ -125,14 +122,17 @@ public class Room {
             return;
         }
 
-        List<String> directions = new ArrayList<>(exits.keySet());
-        List<Room> rooms = new ArrayList<>(exits.values());
+        
 
-        Collections.shuffle(rooms);
+        List<String> directions = new ArrayList<>(exits.keySet());
+        List<Exit> new_exits = new ArrayList<>(exits.values());
+        
+
+        Collections.shuffle(new_exits);
 
         exits.clear();
         for (int i = 0; i < directions.size(); i++) {
-            exits.put(directions.get(i), rooms.get(i));
+            exits.put(directions.get(i), new_exits.get(i));
         }
     }
 }

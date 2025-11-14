@@ -5,8 +5,8 @@ import model.Region;
 
 public class EndRoom extends Room {
 
-    public EndRoom(String description, Region region) {
-        super(description, region);
+    public EndRoom(String id, String name, String description) {
+        super(id, name, description);
     }
 
     @Override

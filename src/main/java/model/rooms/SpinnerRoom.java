@@ -7,8 +7,8 @@ import model.GameContext;
 import model.Region;
 
 public class SpinnerRoom extends Room {
-    public SpinnerRoom(String description, Region region) {
-        super(description, region);
+    public SpinnerRoom(String id, String name, String description) {
+        super(id, name, description);
     }
 
     @Override
