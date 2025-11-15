@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 import model.items.*;
+import model.Direction;
 import model.GameContext;
 import model.Region;
 
@@ -15,8 +16,7 @@ public class Room {
     private String name;
     private String description;
     private boolean isMarked = false;
-    private String chalkMarking;
-    private Map<String, Exit> exits;
+    private Map<Direction, Exit> exits;
     private List<Item> items;
     //private Region region;
 
@@ -68,19 +68,19 @@ public class Room {
         return this.description;
     }
 
-    public void setExit(String direction, Exit exit) {
+    public void setExit(Direction direction, Exit exit) {
         this.exits.put(direction, exit);
     }
 
-    public boolean isExitLocked(String direction) {
+    public boolean isExitLocked(Direction direction) {
         return this.exits.get(direction).isLocked();
     }
 
-    public void unlockExit(String direction) {
+    public void unlockExit(Direction direction) {
         this.exits.get(direction).unlock();
     }
 
-    public Room getExit(String direction) {
+    public Room getExit(Direction direction) {
         
         return this.exits.get(direction).getTargetRoom();
     }
@@ -88,7 +88,7 @@ public class Room {
     public String getExitString() {
         StringBuilder sb = new StringBuilder();
 
-        for(String direction : this.exits.keySet()) {
+        for(Direction direction : this.exits.keySet()) {
             sb.append(direction).append(" ");
         }
 
@@ -124,7 +124,7 @@ public class Room {
 
         
 
-        List<String> directions = new ArrayList<>(exits.keySet());
+        List<Direction> directions = new ArrayList<>(exits.keySet());
         List<Exit> new_exits = new ArrayList<>(exits.values());
         
 

@@ -19,8 +19,7 @@ public class Exit {
         return exit;
     }
 
-    public Exit(String targetRoomId, boolean isLocked, String key, String message) {
-        // Placeholder constructor; actual Room lookup should be done in WorldBuilder
+    private Exit(String targetRoomId, boolean isLocked, String key, String message) {
         this.targetRoom = null; // to be set later
         this.isLocked = isLocked;
         this.key = key;

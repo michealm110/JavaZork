@@ -199,13 +199,13 @@ public class GameController implements GameContext{
         }
 
         Room current = this.player.getCurrentRoom();
-        Room nextRoom = current.getExit(direction.getText());
+        Room nextRoom = current.getExit(direction);
 
         if (nextRoom == null) {
             view.showMessage("There is no door!");
             return;
         }
-        if (current.isExitLocked(direction.getText())) {
+        if (current.isExitLocked(direction)) {
             view.showMessage("A locked gate blocks your way to the " + direction.getText() + ".");
             return;
         }
