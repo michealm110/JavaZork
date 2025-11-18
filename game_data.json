@@ -33,6 +33,13 @@
           "desc": "A large golden key with ‘CL’ scratched into it. It probably opens something in the estate.",
           "portable": "true",
           "type": "KEY"
+        },
+        {
+          "id": "item_rusty_key",
+          "name": "Rusty Key",
+          "desc": "A large rusty key with ‘CL’ scratched into it. It probably opens something in the estate.",
+          "portable": "true",
+          "type": "KEY"
         }
       ]
     },
@@ -146,7 +153,9 @@
       "lockedExits": {
         "south": {
           "key": "item_key",
-          "msg": "The tall metal gate is locked. The golden key marked 'CL' might open it."
+          "msg": "The tall metal gate is locked. The golden key marked 'CL' might open it.",
+          "msg_unlock": "You unlock the tall metal gate with the golden key.",
+          "msg_unlock_fail": "The key doesn't fit the lock on the tall metal gate."
         }
       }
     },

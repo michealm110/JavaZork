@@ -17,15 +17,20 @@ public class Parser {
     public Command parse(String inputLine) {
         String word1 = null;
         String word2 = null;
+        String word3 = null;
 
-        Scanner tokenizer = new Scanner(inputLine);
-        if (tokenizer.hasNext()) {
-            word1 = tokenizer.next();
+        try (Scanner tokenizer = new Scanner(inputLine)) {
             if (tokenizer.hasNext()) {
-                word2 = tokenizer.next();
+                word1 = tokenizer.next();
+                if (tokenizer.hasNext()) {
+                    word2 = tokenizer.next();
+                    if (tokenizer.hasNext()) {
+                        word3 = tokenizer.next();
+                    }
+                }
             }
         }
-        return this.commands.isCommand(word1) ? new Command(word1, word2) : new Command((String)null, word2);
+        return new Command(word1, word2, word3);
     }
 
     // old method kept only for console backend

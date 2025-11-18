@@ -2,5 +2,7 @@ package model.items;
 
 public enum ItemType {
     KEY,
-    CHALK
+    CHALK,
+    WEAPON,
+    GENERIC
 }

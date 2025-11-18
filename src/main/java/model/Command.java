@@ -3,25 +3,18 @@ package model;
 public class Command {
     private String commandWord;
     private String secondWord;
+    private String thirdWord;
 
-    public Command(String firstWord, String secondWord) {
-        this.commandWord = firstWord;
-        this.secondWord = secondWord;
+    public Command(String first, String second, String third) {
+        this.commandWord = first;
+        this.secondWord = second;
+        this.thirdWord = third;
     }
 
-    public String getCommandWord() {
-        return this.commandWord;
-    }
+    public String getCommandWord() { return commandWord; }
+    public String getSecondWord() { return secondWord; }
+    public String getThirdWord() { return thirdWord; }
 
-    public String getSecondWord() {
-        return this.secondWord;
-    }
-
-    public boolean isUnknown() {
-        return this.commandWord == null;
-    }
-
-    public boolean hasSecondWord() {
-        return this.secondWord != null;
-    }
+    public boolean hasSecondWord() { return secondWord != null; }
+    public boolean hasThirdWord() { return thirdWord != null; } 
 }

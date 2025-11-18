@@ -1,7 +1,6 @@
 package model;
 
 import model.items.*;
-import model.rooms.Exit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,13 +40,42 @@ public class WorldBuilder {
                 Room room = new Room(rJson.getString("id"), rJson.getString("name"), rJson.getString("description"));
                 
                 if (rJson.has("items")) {
-                    JSONArray items = rJson.getJSONArray("items");
-                    for (int j = 0; j < items.length(); j++) {
-                            JSONObject iJson = items.getJSONObject(j);
-                        //TODO: clean this up
-                        boolean isPort = iJson.optBoolean("portable") || Boolean.parseBoolean(iJson.optString("portable"));
-                        room.addItem(new Item(iJson.getString("id"), iJson.getString("name"), iJson.getString("desc"), isPort, iJson.getEnum(ItemType.class, "type")));
-                    }
+                        JSONArray items = rJson.getJSONArray("items");
+                        for (int j = 0; j < items.length(); j++) {
+                        JSONObject iJson = items.getJSONObject(j);
+                        
+                        String id = iJson.getString("id");
+                        String name = iJson.getString("name");
+                        String desc = iJson.getString("desc");
+                        boolean isPortable = iJson.optBoolean("portable", true);
+                        
+                        // Get type, default to GENERIC if missing
+                        ItemType type = ItemType.GENERIC;
+                        if(iJson.has("type")) {
+                                type = iJson.getEnum(ItemType.class, "type");
+                        }
+
+                        Item item;
+                        
+                        // FACTORY LOGIC
+                        switch (type) {
+                                case KEY:
+                                item = new KeyItem(id, name, desc);
+                                break;
+                                case CHALK:
+                                item = new ChalkItem(id, name, desc);
+                                break;
+                                case WEAPON:
+                                int dmg = iJson.optInt("damage", 5); // Default damage
+                                item = new WeaponItem(id, name, desc, dmg);
+                                break;
+                                default:
+                                item = new GenericItem(id, name, desc, isPortable);
+                                break;
+                        }
+                        
+                        room.addItem(item);
+                        }
                 }
                 rooms.put(room.getId(), room);
             }
@@ -64,11 +92,18 @@ public class WorldBuilder {
                         // Check for locks
                         if (rJson.has("lockedExits") && rJson.getJSONObject("lockedExits").has(dir)) {
                             JSONObject lock = rJson.getJSONObject("lockedExits").getJSONObject(dir);
+                            String targetRoomId = exits.getString(dir);
+                            Room targetRoom = rooms.get(targetRoomId);
+                            exit =  Exit.createUnlockedExit(targetRoom); 
                             String key = lock.getString("key");
                             String msg = lock.getString("msg");
-                            exit =  Exit.createLockedExit(rooms.get(exits.getString(dir)), key, msg);
+                            String msg_unlock = lock.getString("msg_unlock");
+                            String msg_unlock_fail = lock.getString("msg_unlock_fail");
+                            exit =  Exit.createLockedExit(targetRoom, key, msg, msg_unlock, msg_unlock_fail);
                         } else {
-                            exit =  Exit.createUnlockedExit(room); 
+                            String targetRoomId = exits.getString(dir);
+                            Room targetRoom = rooms.get(targetRoomId);
+                            exit =  Exit.createUnlockedExit(targetRoom); 
                         }
                         Direction direction = Direction.fromString(dir);
                         room.setExit(direction, exit);

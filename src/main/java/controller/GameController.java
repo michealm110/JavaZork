@@ -129,6 +129,8 @@ public class GameController implements GameContext{
         }
 
         String itemName = command.getSecondWord();
+        String target = command.getThirdWord();
+
         Item item = player.getItemFromInventory(itemName);
 
         if (item == null) {
@@ -136,12 +138,10 @@ public class GameController implements GameContext{
             return;
         }
 
-
         //polymorphic use item call
-        //item.use(this, player);
+        item.use(this, player, target);
     }
-
-
+    
     private void takeItem(Command command) {
         if (!command.hasSecondWord()) {
             view.showMessage("Take what?");
@@ -199,13 +199,14 @@ public class GameController implements GameContext{
         }
 
         Room current = this.player.getCurrentRoom();
-        Room nextRoom = current.getExit(direction);
+        Exit exit = current.getExit(direction);
 
-        if (nextRoom == null) {
+        if (exit == null) {
             view.showMessage("There is no door!");
             return;
         }
-        if (current.isExitLocked(direction)) {
+
+        if (exit.isLocked()) {
             view.showMessage("A locked gate blocks your way to the " + direction.getText() + ".");
             return;
         }
@@ -213,6 +214,7 @@ public class GameController implements GameContext{
         //Region fromRegion = current.getRegion();
         //Region toRegion   = nextRoom.getRegion();
 
+        Room nextRoom = exit.getTargetRoom();
         this.player.setCurrentRoom(nextRoom);
 
         // region change

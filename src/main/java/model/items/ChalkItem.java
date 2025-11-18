@@ -9,19 +9,11 @@ public class ChalkItem extends Item {
         super(id, name, description, true, ItemType.CHALK);
     }
 
-    public void use(GameContext context, Character player) {
-        if (context.keyInInventory()) {
-            context.showMessage("You have already used the chalk to mark your path.");
-            return;
-        }
-
+    @Override
+    public void use(GameContext context, Character player, String target) {
+        // Chalk ignores the target. "use chalk north" vs "use chalk" does the same thing.
         Room current = player.getCurrentRoom();
-
-        if (!current.hasChalkMark()) {
-            current.markWithChalk();
-            context.showMessage("You mark the room with chalk to remember you've been here.");
-        } else {
-            context.showMessage("This room is already marked with chalk.");
-        }
+        current.markWithChalk();
+        context.showMessage("You mark the floor with chalk.");
     }
 }

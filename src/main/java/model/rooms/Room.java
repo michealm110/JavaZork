@@ -76,13 +76,13 @@ public class Room {
         return this.exits.get(direction).isLocked();
     }
 
-    public void unlockExit(Direction direction) {
-        this.exits.get(direction).unlock();
+    public Room getTargetRoom(Direction direction) {
+
+        return this.exits.get(direction).getTargetRoom();
     }
 
-    public Room getExit(Direction direction) {
-        
-        return this.exits.get(direction).getTargetRoom();
+    public Exit getExit(Direction direction) {
+        return this.exits.get(direction);
     }
 
     public String getExitString() {

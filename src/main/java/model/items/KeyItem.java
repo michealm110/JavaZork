@@ -4,22 +4,51 @@ import model.Character;
 import model.Direction;
 import model.GameContext;   
 import model.rooms.Room; 
+import model.rooms.Exit;
 
 
-public class KeyItem extends Item {
+public class KeyItem extends model.items.Item {
 
     public KeyItem(String id, String name, String description) {
         super(id, name, description, true, ItemType.KEY);
     }
 
-    public void use(GameContext game, Character player) {
-        Room current = player.getCurrentRoom();
-
-        if (current.isExitLocked(Direction.SOUTH)) {
-            current.unlockExit(Direction.SOUTH);
-            game.showMessage("You unlock the gate to the south with the key. It swings open with a creak.");
-        } else {
-            game.showMessage("You jiggle the key in the air, but there’s nothing to unlock here.");
+    @Override
+    public void use(GameContext context, Character player, String target) {
+        if (target == null) {
+            context.showMessage("Use the key on what? (Example: 'use key north')");
+            return;
         }
+
+        Direction dir;
+        try {
+            dir = Direction.fromString(target);
+        } catch (Exception e) {
+            context.showMessage("That is not a valid direction.");
+            return;
+        }
+
+        Room currentRoom = player.getCurrentRoom();
+
+        Exit exit = currentRoom.getExit(dir);
+
+        if (exit == null) {
+            context.showMessage("There is no exit to the " + dir.getText() + ".");
+            return;
+        }
+
+        if (!exit.isLocked()) {
+            context.showMessage("The door to the " + dir.getText() + " is already unlocked.");
+            return;
+        }
+
+
+
+        if (exit.unlock(this.getId())) {    
+            context.showMessage(exit.getMessageUnlock());
+        } else {
+            context.showMessage(exit.getMessageUnlockFail());
+        }
+
     }
 }

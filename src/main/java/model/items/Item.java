@@ -1,7 +1,10 @@
 package model.items;
 
+import model.GameContext;
+import model.Character;
+
 //we'll get to polymorphism later
-public class Item {
+public abstract class Item {
     private String id;
     private String name;
     private String description;
@@ -28,5 +31,9 @@ public class Item {
         return this.type;
     }
 
-    //public abstract void use(GameContext context, Character player);
+    public String getId() {
+        return this.id;
+    }
+
+    public abstract void use(GameContext context, Character player, String target);
 }
