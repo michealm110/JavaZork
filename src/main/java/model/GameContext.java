@@ -6,6 +6,5 @@ public interface GameContext{
     void showMessagePrint(String message);
     int getSecondsElapsed();
     int getTurnCount();
-    void markFinalRoom();
     boolean keyInInventory();
 }

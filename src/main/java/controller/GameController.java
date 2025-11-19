@@ -2,10 +2,9 @@ package controller;
 
 import model.Character;
 import model.Command;
-import model.CommandWords;   
+import model.CommandWords;
 import model.items.*;
 import model.rooms.*;
-import model.ZorkUL;
 import model.GameTimer;
 import model.GameContext;
 import model.TurnManager;
@@ -13,39 +12,70 @@ import model.Direction;
 import model.Region;
 import view.ConsoleView;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameController implements GameContext{
     private Parser parser;
     private Character player;
     private ConsoleView view;
     private GameTimer timer;
     private TurnManager turnManager;
-    private boolean finalRoom = false;
 
+    private Map<String, Method> commandMethods;
+    private Map<String, Boolean> commandTurnConsumption = new HashMap<>();
+
+    // intorduced little bit of state to track whetehr game is ended, got confusing to use return values with annotations/refeleciton
+    private boolean finished = false;
+    
     public GameController(Character player, Parser parser, ConsoleView view, TurnManager turnManager, GameTimer timer) {
         this.player = player;
         this.parser = parser;
         this.view = view;
         this.timer = timer;
         this.turnManager = turnManager;
+        this.commandMethods = new HashMap<>();
+
+        this.initCommands();
+    }
+
+    private void initCommands() {
+        //scans THIS CLASS ONLY for methods with @CommandDef annotation
+        // and registers them in commandMethods map
+        // this replaces the old big switch statement
+
+        CommandWords validCommands = parser.getCommandWords();
+
+        for (Method method : this.getClass().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(CommandDef.class)) {
+                CommandDef annotation = method.getAnnotation(CommandDef.class);
+                String description = annotation.description();
+                boolean consumesTurn = annotation.consumesTurn();
+
+                for (String keyword : annotation.value()) {
+                    commandMethods.put(keyword, method);
+                    commandTurnConsumption.put(keyword, consumesTurn);
+                    validCommands.addCommand(keyword, description);
+                }
+            }
+        }
     }
 
 
     public void startGame() {
         timer.start();
-
         this.printWelcome();
 
-        Command command;
-        for(boolean finished = false; !finished; finished = this.processCommand(command)) {
-            command = this.parser.getCommand(this);
+       while (!finished) {
+            Command command = this.parser.getCommand(this);
+            processCommand(command);
         }
-
+       
         view.showMessage("Thank you for playing. Goodbye.");
 
         timer.stop();
     }
-    private void pickUpPint() {}
-    private void openChest() {}
 
     private void printWelcome() {
         view.showBlankLine();
@@ -55,73 +85,52 @@ public class GameController implements GameContext{
         this.player.getCurrentRoom().onEnter(this);
     }
 
-    private boolean consumesTurn(String commandWord) {
-        switch (commandWord) {
-            case "inventory":
-            case "help":
-            case "time":
-            case "turns":
-                return false;
-            default:
-                return true;
-        }
-    }
 
-    private boolean processCommand(Command command) {
+    private void processCommand(Command command) {
         String commandWord = command.getCommandWord();
+
         if (commandWord == null) {
             view.showMessage("I don't understand your command...");
-            return false;
-        } else {
-            if (consumesTurn(commandWord)) {
+            return;
+        }
+
+        Method method = commandMethods.get(commandWord);
+
+        if (method != null) {
+            // Check if this command consumes a turn
+            Boolean consumesTurn = commandTurnConsumption.get(commandWord);
+            if (consumesTurn != null && consumesTurn) {
                 turnManager.nextTurn();
             }
-            switch (commandWord) {
-                case "inventory":
-                    player.listItems(this);
-                    break;
-                case "help":
-                    printHelp();
-                    break;
-                case "go":
-                    goRoom(command);
-                    if (finalRoom) {
-                        return true;
-                    }
-                    break;
-                case "quit":
-                    if (command.hasSecondWord()) {
-                        view.showMessage("Quit what?");
-                        return false;
-                    } 
-                    return true;
-                case "open":
-                    openChest();
-                    break;
-                case "take":
-                    takeItem(command);
-                    break;
-                case "drop":
-                    removeItem(command);
-                    break;
-                case "time":
-                    view.showMessage("Time elapsed: " + timer.getSecondsElapsed() + " seconds.");
-                    break;
-                case "turns":
-                    view.showMessage("Turns taken: " + turnManager.getTurnCount() + ".");
-                    break;
-                case "use":
-                    useItem(command);
-                    break;
-                default:
-                    view.showMessage("I don't know what you mean...");
-                    break;
-            }
 
-            return false;
+            try {
+                // Invoke the method using reflection
+                method.invoke(this, command);
+            } catch (Exception e) {
+                view.showMessage("Error executing command: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            view.showMessage("I don't know what you mean...");
         }
     }
 
+    @CommandDef(value = {"quit", "exit"}, description = "End the game", consumesTurn = false)
+    public void executeQuit(Command command) {
+        if (command.hasSecondWord()) {
+            view.showMessage("Quit what?");
+            return;
+        }  else {
+            finished = true;
+        }
+    }
+
+    @CommandDef(value = {"inventory", "inv"}, description = "List current inventory", consumesTurn = false)
+    public void executeInventory(Command command) {
+        player.listItems(this);
+    }
+
+    @CommandDef(value = {"use"}, description = "Use an item from inventory", consumesTurn = true)
     private void useItem(Command command) {
         if (!command.hasSecondWord()) {
             view.showMessage("Use what?");
@@ -141,7 +150,8 @@ public class GameController implements GameContext{
         //polymorphic use item call
         item.use(this, player, target);
     }
-    
+     
+    @CommandDef(value = {"take", "pickup"}, description = "Pick up an item")
     private void takeItem(Command command) {
         if (!command.hasSecondWord()) {
             view.showMessage("Take what?");
@@ -158,15 +168,15 @@ public class GameController implements GameContext{
         view.showMessage("You picked up the " + itemName + ".");
     }
 
-
-
-    private void printHelp() {
+    @CommandDef(value = {"help"}, description = "Show help", consumesTurn = false)
+    private void printHelp(Command command) {
         view.showMessage("You are lost. You are alone. You wander around the streets.");
         String[] commands = parser.getCommandWords().getAllCommands();
         view.showCommands(commands);
 
     }
 
+    @CommandDef(value = {"drop"}, description = "Drop an item")
     private void removeItem(Command command) {
         if (!command.hasSecondWord()) {
             view.showMessage("Drop what?");
@@ -183,12 +193,13 @@ public class GameController implements GameContext{
             view.showMessage("You dropped the " + item.getName() + ".");
         }
     }
-
+    
+    @CommandDef(value = {"go", "walk", "move"}, description = "Move to another room")
     private void goRoom(Command command) {
         if (!command.hasSecondWord()) {
             view.showMessage("Go where?");
             return;
-        } 
+        }
         String directionWord = command.getSecondWord();
         Direction direction;
         try {
@@ -224,7 +235,23 @@ public class GameController implements GameContext{
 
         // polymorphic call to onEnter
         nextRoom.onEnter(this);
-     
+
+    }
+
+    @CommandDef(value = {"time"}, description = "Show elapsed time in seconds", consumesTurn = false)
+    public void showTime(Command command) {
+        view.showMessage("Time elapsed: " + timer.getSecondsElapsed() + " seconds.");
+    }
+
+    @CommandDef(value = {"turns"}, description = "Show number of turns taken", consumesTurn = false)
+    public void showTurns(Command command) {
+        view.showMessage("Turns taken: " + turnManager.getTurnCount() + ".");
+    }
+
+    // Placeholder method kept from original code
+    @CommandDef(value = {"open"}, description = "Open something")
+    public void openSomething(Command command) {
+        view.showMessage("Open what?");
     }
     
     private void showRegionTransition(Region from, Region to) {
@@ -264,10 +291,6 @@ public class GameController implements GameContext{
     @Override
     public int getTurnCount() {
         return turnManager.getTurnCount();
-    }
-    @Override
-    public void markFinalRoom() {
-        finalRoom = true;
     }
     @Override
     public boolean keyInInventory() {

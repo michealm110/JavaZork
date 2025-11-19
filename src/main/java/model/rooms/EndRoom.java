@@ -34,7 +34,5 @@ public class EndRoom extends Room {
         game.showMessage("This delivery took you " + game.getSecondsElapsed() + " seconds.");
         game.showMessage("You made " + game.getTurnCount() + " turns.");
         game.showMessage("THE END.");
-
-        game.markFinalRoom();
     }
 }
