@@ -1,6 +1,9 @@
 import controller.GameController;
 import controller.Parser;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Character;
 import model.GameTimer;
@@ -9,30 +12,41 @@ import model.WorldBuilder;
 import model.rooms.Room;
 import view.GuiView;
 
+import java.io.IOException;
+
 public class GuiApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        WorldBuilder worldBuilder = new WorldBuilder();
-        Room startingRoom = worldBuilder.load("game_data.json");
-        Character player = new Character("Player", startingRoom);
-        
-        GameTimer timer = new GameTimer();
-        TurnManager turnManager = new TurnManager();
-        Parser parser = new Parser();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/game_view.fxml"));
+            Parent root = loader.load();
 
-        GuiView guiView = new GuiView();
+            GuiView guiView = loader.getController();
 
-        GameController gameController = new GameController(player, parser, guiView, turnManager, timer);
+            WorldBuilder worldBuilder = new WorldBuilder();
+            Room startingRoom = worldBuilder.load("game_data.json");
+            Character player = new Character("Player", startingRoom);
+            
+            GameTimer timer = new GameTimer();
+            TurnManager turnManager = new TurnManager();
+            Parser parser = new Parser();
 
-        // When GUI sends input, pass it to gameController
-        guiView.setInputProcessor(input -> gameController.handleInput(input));
+            GameController gameController = new GameController(player, parser, guiView, turnManager, timer);
 
-        primaryStage.setTitle("DeliveryDash - GUI Edition");
-        primaryStage.setScene(guiView.createScene());
-        primaryStage.show();
+            guiView.setInputProcessor(input -> gameController.handleInput(input));
 
-        gameController.startGame();
+            Scene scene = new Scene(root);
+            primaryStage.setTitle("DeliveryDash - FXML Edition");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+            gameController.startGame();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to load FXML file.");
+        }
     }
 
     public static void main(String[] args) {
