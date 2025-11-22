@@ -52,6 +52,11 @@ public class Character {
         return null;
     }
 
+
+    public List<Item> getItems() {
+        return this.inventory;
+    }
+
     public void listItems(GameContext game) {
         if (inventory.isEmpty()) {
             game.showMessage("Your inventory is currently empty.");

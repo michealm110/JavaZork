@@ -10,7 +10,7 @@ import model.GameContext;
 import model.TurnManager;
 import model.Direction;
 import model.Region;
-import view.ConsoleView;
+import view.IGameView;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class GameController implements GameContext{
     private Parser parser;
     private Character player;
-    private ConsoleView view;
+    private IGameView view;
     private GameTimer timer;
     private TurnManager turnManager;
 
@@ -29,7 +29,7 @@ public class GameController implements GameContext{
     // intorduced little bit of state to track whetehr game is ended, got confusing to use return values with annotations/refeleciton
     private boolean finished = false;
     
-    public GameController(Character player, Parser parser, ConsoleView view, TurnManager turnManager, GameTimer timer) {
+    public GameController(Character player, Parser parser, IGameView view, TurnManager turnManager, GameTimer timer) {
         this.player = player;
         this.parser = parser;
         this.view = view;
@@ -66,14 +66,27 @@ public class GameController implements GameContext{
     public void startGame() {
         timer.start();
         this.printWelcome();
+        updateGuiState();
 
-       while (!finished) {
-            Command command = this.parser.getCommand(this);
-            processCommand(command);
-        }
-       
+
         view.showMessage("Thank you for playing. Goodbye.");
 
+        timer.stop();
+    }
+
+    
+    private void updateGuiState() {
+        view.updateRoomInfo(player.getCurrentRoom());
+        view.updateInventory(player.getItems());
+    }
+
+    private void startConsoleLoop() {
+        startGame();
+        while (!finished) {
+           // Command command = this.parser.getCommand(this);
+           // processCommand(command);
+        }
+        view.showMessage("Thank you for playing. Goodbye.");
         timer.stop();
     }
 
@@ -83,6 +96,18 @@ public class GameController implements GameContext{
         view.showMessage("Type 'help' if you need help.");
         view.showBlankLine();
         this.player.getCurrentRoom().onEnter(this);
+    }
+
+    public void handleInput(String input) {
+        //can we get the console loop here too?
+        if (finished) return;
+        
+        view.showMessage("> " + input);
+        Command command = parser.parse(input);
+        processCommand(command);
+        
+        // Refresh GUI state after every command
+        updateGuiState();
     }
 
 
