@@ -1,20 +1,19 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.List;
 import model.rooms.*;
 import model.items.*;
-import model.GameContext;
 
 
 public class Character {
     private String name;
     private Room currentRoom;
-    private List<Item> inventory = new ArrayList<>();
+    private ItemContainer<Item> inventory;
 
     public Character(String name, Room startingRoom) {
         this.name = name;
         this.currentRoom = startingRoom;
+        this.inventory = new ItemContainer<>();
     }
 
     public String getName() {
@@ -29,32 +28,20 @@ public class Character {
         this.currentRoom = room;
     }
 
-    public void addItem(Item item) {
+    public void addItem(Item item) throws InventoryFullException{
         this.inventory.add(item);
     }
 
     public Item removeItem(String itemName) {
-        for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(itemName)) {
-                inventory.remove(item);
-                return item;
-            }
-        }
-        return null;
+        return this.inventory.remove(itemName);
     }
 
     public Item getItemFromInventory(String itemName) {
-        for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(itemName)) {
-                return item;
-            }
-        }
-        return null;
+        return this.inventory.find(itemName);
     }
 
-
     public List<Item> getItems() {
-        return this.inventory;
+        return this.inventory.getAll();
     }
 
     public void listItems(GameContext game) {
@@ -62,14 +49,14 @@ public class Character {
             game.showMessage("Your inventory is currently empty.");
         } else {
             int i = 1;
-            for (Item item : inventory) {
+            for (Item item : inventory.getAll()) {
                 game.showMessage(i + ". " + item.getName());
                 i++;
             }
         }
     }
     public boolean hasItem(String itemName) {
-        for (Item item : inventory) {
+        for (Item item : inventory.getAll()) {
             if (item.getName().equalsIgnoreCase(itemName)) {
                 return true;
             }

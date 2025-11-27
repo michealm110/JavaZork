@@ -6,6 +6,7 @@ import model.CommandWords;
 import model.items.*;
 import model.rooms.*;
 import model.GameTimer;
+import model.InventoryFullException;
 import model.GameContext;
 import model.TurnManager;
 import model.Direction;
@@ -189,7 +190,13 @@ public class GameController implements GameContext{
             view.showMessage("There is no '" + itemName + "' here.");
             return;
         }
-        player.addItem(item);
+        try {
+            player.addItem(item);
+        } catch (InventoryFullException e) {
+            current.addItem(item); // put it back
+            view.showMessage("Your inventory is full. You cannot carry the " + itemName + ".");
+            return;
+        }
         view.showMessage("You picked up the " + itemName + ".");
     }
 

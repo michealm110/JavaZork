@@ -5,10 +5,10 @@ import model.Character;
 
 //we'll get to polymorphism later
 public abstract class Item {
-    private String id;
-    private String name;
-    private String description;
-    private boolean isPortable;
+    private final String id;
+    private final String name;
+    private final String description;
+    private final boolean isPortable;
     private final ItemType type;
 
     public Item(String id, String name, String description, boolean isPortable, ItemType type) {

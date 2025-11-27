@@ -4,7 +4,7 @@ import model.GameContext;
 import model.Character;
 
 public class WeaponItem extends Item {
-    private int damage;
+    private final int damage;
 
     public WeaponItem(String id, String name, String description, int damage) {
         super(id, name, description, true, ItemType.WEAPON);
