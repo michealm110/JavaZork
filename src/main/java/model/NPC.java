@@ -1,11 +1,13 @@
 package model;
 
-public class NPC {
-    private String id;
-    private String name;
-    private String description;
+import java.io.Serializable;
+
+public class NPC implements Serializable{
+    private final String id;
+    private final String name;
+    private final String description;
     private String currentRoomId;
-    private boolean isHostile;
+    private final boolean isHostile;
 
     public NPC(String id, String name, String description, String currentRoomId, boolean isHostile) {
         this.id = id;

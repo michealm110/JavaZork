@@ -37,7 +37,7 @@ public class GuiApp extends Application {
             guiView.setInputProcessor(input -> gameController.handleInput(input));
 
             Scene scene = new Scene(root);
-            primaryStage.setTitle("DeliveryDash - FXML Edition");
+            primaryStage.setTitle("Delivery Dash");
             primaryStage.setScene(scene);
             primaryStage.show();
 

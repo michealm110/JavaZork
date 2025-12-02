@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import model.items.Item;
 
 // one of these will be the inventory. ItemContainer<Item> inventory;
 // another one coulde be a keyring. ItemContainer<KeyItem> keyRing;
-public class ItemContainer<T extends Item> {
+public class ItemContainer<T extends Item> implements Serializable{
     
     // Internal storage using the generic type
     private final List<T> items;

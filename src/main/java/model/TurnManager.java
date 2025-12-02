@@ -14,4 +14,8 @@ public class TurnManager {
     public int getTurnCount() {
         return this.turnCount;
     }
+
+    public void setTurnCount(int turnCount) {
+        this.turnCount = turnCount;
+    }
 }

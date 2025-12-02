@@ -20,6 +20,10 @@ public class GameTimer {
         return secondsElapsed;
     }
 
+    public void setSecondsElapsed(int seconds) {
+        this.secondsElapsed = seconds;
+    }
+
     public void stop() {
         timer.cancel();
     }

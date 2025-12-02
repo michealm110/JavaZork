@@ -1,6 +1,8 @@
 package model.rooms;
 
-public class Exit {
+import java.io.Serializable;
+
+public class Exit implements Serializable{
     private Room targetRoom;
     private boolean isLocked;
     private String key;

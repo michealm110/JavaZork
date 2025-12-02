@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
+import java.io.Serializable;
 import model.items.*;
 import model.Direction;
 import model.GameContext;
 import model.Region;
 
-public class Room {
+public class Room implements Serializable {
 
     private String id;
     private String name;

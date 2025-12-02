@@ -8,11 +8,18 @@ import model.rooms.*;
 import model.GameTimer;
 import model.InventoryFullException;
 import model.GameContext;
+import model.GameState;
 import model.TurnManager;
 import model.Direction;
 import model.Region;
 import view.IGameView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -250,7 +257,7 @@ public class GameController implements GameContext{
         }
 
         if (exit.isLocked()) {
-            view.showMessage("A locked gate blocks your way to the " + direction.getText() + ".");
+            view.showMessage(exit.getMessage());
             return;
         }
 
@@ -284,6 +291,63 @@ public class GameController implements GameContext{
     @CommandDef(value = {"open"}, description = "Open something")
     public void openSomething(Command command) {
         view.showMessage("Open what?");
+    }
+    
+    @CommandDef(value = {"save"}, description = "Save the game state", consumesTurn = false)
+    public void saveGame(Command command) {
+        String filename = "savegame";
+
+        try (FileOutputStream fileOut = new FileOutputStream(filename);
+             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            
+            // Create a snapshot of the game
+            GameState state = new GameState(
+                this.player, 
+                this.timer.getSecondsElapsed(), 
+                this.turnManager.getTurnCount()
+            );
+
+            out.writeObject(state);
+            view.showMessage("Game saved successfully to " + filename);
+
+        } catch (IOException i) {
+            view.showMessage("Error saving game: " + i.getMessage());
+            i.printStackTrace();
+        }
+    }
+
+    @CommandDef(value = {"load"}, description = "Load a saved game", consumesTurn = false)
+    public void loadGame(Command command) {
+        String filename = "savegame";
+
+        File f = new File(filename);
+        if(!f.exists()) {
+            view.showMessage("Save file '" + filename + "' not found.");
+            return;
+        }
+
+        try (FileInputStream fileIn = new FileInputStream(filename);
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+
+            GameState state = (GameState) in.readObject();
+
+            this.player = state.getPlayer();
+
+            this.timer.setSecondsElapsed(state.getSecondsElapsed());
+
+            this.turnManager.setTurnCount(state.getTurnCount());
+
+            view.showMessage("Game loaded!");
+            view.updateRoomInfo(this.player.getCurrentRoom());
+            view.updateInventory(this.player.getItems());
+            
+            this.player.getCurrentRoom().onEnter(this);
+
+        } catch (IOException i) {
+            view.showMessage("Error loading file: " + i.getMessage());
+        } catch (ClassNotFoundException c) {
+            view.showMessage("Save file is corrupted or incompatible.");
+        }
     }
     
     private void showRegionTransition(Region from, Region to) {

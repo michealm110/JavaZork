@@ -12,4 +12,6 @@ release.properties
 *.war
 *.ear
 
+savegame
+
 repomix-output.xml

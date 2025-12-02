@@ -1,10 +1,13 @@
 package model.items;
 
 import model.GameContext;
+
+import java.io.Serializable;
+
 import model.Character;
 
 //we'll get to polymorphism later
-public abstract class Item {
+public abstract class Item implements Serializable{
     private final String id;
     private final String name;
     private final String description;

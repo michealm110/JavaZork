@@ -1,12 +1,13 @@
 package model;
 
+import java.io.Serializable;
 import java.util.List;
 import model.rooms.*;
 import model.items.*;
 
 
-public class Character {
-    private String name;
+public class Character implements Serializable{
+    private final String name;
     private Room currentRoom;
     private ItemContainer<Item> inventory;
 
