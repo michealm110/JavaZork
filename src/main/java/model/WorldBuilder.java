@@ -23,7 +23,8 @@ public class WorldBuilder {
 
     public Room load(String fileName) {
         try {
-            //first, load as JSON from the expected path.
+            //first, load as JSON from the expected patho
+            
             Path path = Paths.get(fileName);
             if (!Files.exists(path)) path = Paths.get("zork", fileName);
             if (!Files.exists(path)) throw new RuntimeException("File not found: " + fileName);
@@ -111,15 +112,48 @@ public class WorldBuilder {
                 }
             }
             
-            // TODO: createdNPCs
+            // created npcs:
             if (worldJson.has("npcs")) {
                 JSONArray npcArray = worldJson.getJSONArray("npcs");
                 for (int i = 0; i < npcArray.length(); i++) {
                     JSONObject n = npcArray.getJSONObject(i);
-                    boolean hostile = n.optBoolean("hostile") || Boolean.parseBoolean(n.optString("hostile"));
-                    npcs.add(new NPC(n.getString("id"), n.getString("name"), n.getString("desc"), n.getString("room"), hostile));
+                    boolean hostile = n.optBoolean("hostile");
+                    
+                    String roomId = n.getString("room");
+                    boolean wandering = n.optBoolean("wandering", false);
+                    NPC npc;
+
+                    if (wandering) {
+                        npc = new WanderingNPC(
+                            n.getString("id"), 
+                            n.getString("name"), 
+                            n.getString("desc"), 
+                            n.getString("conversation_piece"),
+                            roomId, 
+                            hostile
+                        );
+                    } else {
+                         npc = new NPC(
+                            n.getString("id"), 
+                            n.getString("name"), 
+                            n.getString("desc"), 
+                            n.getString("conversation_piece"),
+                            roomId, 
+                            hostile
+                        );
+                    }
+                    
+                    // Add to global list and to room (just a reference not a duplicate)
+                    npcs.add(npc);
+                    
+                    Room room = rooms.get(roomId);
+                    if (room != null) {
+                        room.addNPC(npc);
+                    }
                 }
             }
+
+
             is.close();
             
         } catch (Exception e) {

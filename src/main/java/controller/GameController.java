@@ -7,6 +7,7 @@ import model.items.*;
 import model.rooms.*;
 import model.GameTimer;
 import model.InventoryFullException;
+import model.NPC;
 import model.GameContext;
 import model.GameState;
 import model.TurnManager;
@@ -22,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameController implements GameContext{
@@ -33,6 +35,12 @@ public class GameController implements GameContext{
 
     private Map<String, Method> commandMethods;
     private Map<String, Boolean> commandTurnConsumption = new HashMap<>();
+
+    //NPC stuff
+    private Thread npcMoverThread;
+    private WanderingNPCMoverThread npcTask;
+    private Map<String, Room> allRooms;
+    private List<NPC> allNpcs;
 
     // intorduced little bit of state to track whetehr game is ended, got confusing to use return values with annotations/refeleciton
     private boolean finished = false;
@@ -46,6 +54,12 @@ public class GameController implements GameContext{
         this.commandMethods = new HashMap<>();
 
         this.initCommands();
+    }
+
+    //should this be in constuctor?
+    public void setWorldMapData(Map<String, Room> rooms, List<NPC> npcs) {
+        this.allRooms = rooms;
+        this.allNpcs = npcs;
     }
 
     private void initCommands() {
@@ -73,6 +87,14 @@ public class GameController implements GameContext{
 
     public void startGame() {
         timer.start();
+        if (allNpcs != null && allRooms != null) {
+            npcTask = new WanderingNPCMoverThread(this, allRooms, allNpcs, player);
+            npcMoverThread = new Thread(npcTask);
+            this.npcMoverThread.setDaemon(true); // So it won't block game closing
+            npcMoverThread.start();
+        }
+
+
         this.printWelcome();
         updateGuiState();
 
@@ -155,6 +177,9 @@ public class GameController implements GameContext{
             return;
         }  else {
             finished = true;
+            if (npcTask != null) {
+                npcTask.stop();
+            }
         }
     }
 
@@ -276,6 +301,32 @@ public class GameController implements GameContext{
         nextRoom.onEnter(this);
 
     }
+
+    @CommandDef(value = {"talk", "speak"}, description = "Talk to an NPC")
+    public void talkTo(Command command) {
+        if (!command.hasSecondWord()) {
+            view.showMessage("Talk to who?");
+            return;
+        }
+
+        String npcName = command.getSecondWord();
+        Room currentRoom = player.getCurrentRoom();
+        NPC npc = currentRoom.getNPCByName(npcName);
+
+        if (npc == null) {
+            view.showMessage("There is no one named '" + npcName + "' here.");
+            return;
+        }
+
+        view.showMessage(npc.getName() + " says: \"" + npc.getConversationPiece() + "\"");
+        
+        // Simple hostility logic
+        if (npc.isHostile()) {
+            view.showMessage("They look angry! you better run!");
+        }
+    }
+
+
 
     @CommandDef(value = {"time"}, description = "Show elapsed time in seconds", consumesTurn = false)
     public void showTime(Command command) {

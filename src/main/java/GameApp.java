@@ -22,6 +22,7 @@ public class GameApp {
         Character player = new Character("Player", startingRoom);
         GameController game = new GameController(player, parser, view, turnManager, timer);
 
+        game.setWorldMapData(worldBuilder.getRooms(), worldBuilder.getNpcs());
         game.startGame();
     }
 }

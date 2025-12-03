@@ -27,12 +27,15 @@ public class GuiApp extends Application {
             WorldBuilder worldBuilder = new WorldBuilder();
             Room startingRoom = worldBuilder.load("game_data.json");
             Character player = new Character("Player", startingRoom);
+
+
             
             GameTimer timer = new GameTimer();
             TurnManager turnManager = new TurnManager();
             Parser parser = new Parser();
 
             GameController gameController = new GameController(player, parser, guiView, turnManager, timer);
+            gameController.setWorldMapData(worldBuilder.getRooms(), worldBuilder.getNpcs());
 
             guiView.setInputProcessor(input -> gameController.handleInput(input));
 
@@ -40,7 +43,7 @@ public class GuiApp extends Application {
             primaryStage.setTitle("Delivery Dash");
             primaryStage.setScene(scene);
             primaryStage.show();
-
+            
             gameController.startGame();
 
         } catch (IOException e) {

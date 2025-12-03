@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Collections;
 import java.io.Serializable;
 import model.items.*;
 import model.Direction;
 import model.GameContext;
+import model.NPC;
 import model.Region;
 
 public class Room implements Serializable {
@@ -19,6 +21,7 @@ public class Room implements Serializable {
     private boolean isMarked = false;
     private Map<Direction, Exit> exits;
     private List<Item> items;
+    private List<NPC> npcs;
     //private Region region;
 
     public Room(String id, String name, String description) {
@@ -27,6 +30,7 @@ public class Room implements Serializable {
         this.description = description;
         this.exits = new HashMap<>();
         this.items = new ArrayList<>();
+        this.npcs = new CopyOnWriteArrayList<>(); //thread-safe list cos NPc move around triggered by seperate thread
     }
 
     //public Region getRegion() {
@@ -89,16 +93,40 @@ public class Room implements Serializable {
     public String getExitString() {
         StringBuilder sb = new StringBuilder();
 
-        for(Direction direction : this.exits.keySet()) {
+        for (Direction direction : this.exits.keySet()) {
             sb.append(direction).append(" ");
         }
 
         return sb.toString().trim();
     }
 
+    // for wandering NPCs
+    public Direction getRandomExitDirection() {
+        List<Direction> validDirections = new ArrayList<>();
+        for (Map.Entry<Direction, Exit> entry : exits.entrySet()) {
+            // NPCs can't walk thorough locked doors
+            if (!entry.getValue().isLocked()) {
+                validDirections.add(entry.getKey());
+            }
+        }
+        
+        if (validDirections.isEmpty()) return null; // shouldn't happen
+        Collections.shuffle(validDirections);
+        return validDirections.get(0);
+    }
+
     public String getLongDescription() {
         String description = this.description;
-        String defaultMessage = "You are " + description + ".\nExits: " + this.getExitString() + "\n" + this.getItemString();
+        String defaultMessage = "You are " + description + ".\nExits: " + this.getExitString() + "\n"
+                + this.getItemString();
+        
+        if (!npcs.isEmpty()) {
+            defaultMessage += "\nCharacters here: ";
+            for (NPC npc : npcs) {
+                defaultMessage += npc.getName() + " ";
+            }
+        }
+        
         if (this.isMarked) {
             return defaultMessage += "\nThis room is marked with chalk";
         }
@@ -111,6 +139,27 @@ public class Room implements Serializable {
 
     public boolean hasChalkMark() {
         return this.isMarked;
+    }
+
+    public void addNPC(NPC npc) {
+        this.npcs.add(npc);
+    }
+
+    public void removeNPC(NPC npc) {
+        this.npcs.remove(npc);
+    }
+    
+    public NPC getNPCByName(String name) {
+        for (NPC npc : npcs) {
+            if (npc.getName().equalsIgnoreCase(name)) {
+                return npc;
+            }
+        }
+        return null;
+    }
+
+    public List<NPC> getNPCs() {
+        return this.npcs;
     }
 
     // polymorphic onEnter method

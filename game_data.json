@@ -36,7 +36,7 @@
         },
         {
           "id": "item_rusty_key",
-          "name": "Rusty Key",
+          "name": "RustyKey",
           "desc": "A large rusty key with ‘CL’ scratched into it. It probably opens something in the estate.",
           "portable": "true",
           "type": "KEY"
@@ -177,5 +177,23 @@
       }
     }
   ],
-  "npcs": []
+  "npcs": [
+    {
+      "id": "npc_bob",
+      "name": "Bob",
+      "desc": "An overweight man, eating a doner kebab.",
+      "room": "room_takeaway_front",
+      "conversation_piece": "I haven't seen any delivery drivers around here lately...",
+      "hostile": false
+    },
+    {
+      "id": "npc_roaming_guard",
+      "name": "Guard",
+      "desc": "A guard on the beat.",
+      "room": "room_main_street_west",
+      "conversation_piece": "Move along or i'll arrest you.",
+      "hostile": false,
+      "wandering": true
+    }
+  ]
 }
