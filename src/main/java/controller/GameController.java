@@ -97,11 +97,6 @@ public class GameController implements GameContext{
 
         this.printWelcome();
         updateGuiState();
-
-
-        view.showMessage("Thank you for playing. Goodbye.");
-
-        timer.stop();
     }
 
     
@@ -176,6 +171,8 @@ public class GameController implements GameContext{
             view.showMessage("Quit what?");
             return;
         }  else {
+            view.showMessage("Thank you for playing. Goodbye.");
+            timer.stop();
             finished = true;
             if (npcTask != null) {
                 npcTask.stop();
@@ -292,6 +289,8 @@ public class GameController implements GameContext{
         Room nextRoom = exit.getTargetRoom();
         this.player.setCurrentRoom(nextRoom);
 
+        this.player.recordVisit(nextRoom);
+
         // region change
         //if (fromRegion != toRegion) {
         //    showRegionTransition(fromRegion, toRegion);
@@ -372,13 +371,13 @@ public class GameController implements GameContext{
         String filename = "savegame";
 
         File f = new File(filename);
-        if(!f.exists()) {
+        if (!f.exists()) {
             view.showMessage("Save file '" + filename + "' not found.");
             return;
         }
 
         try (FileInputStream fileIn = new FileInputStream(filename);
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                ObjectInputStream in = new ObjectInputStream(fileIn)) {
 
             GameState state = (GameState) in.readObject();
 
@@ -391,7 +390,7 @@ public class GameController implements GameContext{
             view.showMessage("Game loaded!");
             view.updateRoomInfo(this.player.getCurrentRoom());
             view.updateInventory(this.player.getItems());
-            
+
             this.player.getCurrentRoom().onEnter(this);
 
         } catch (IOException i) {
@@ -399,6 +398,16 @@ public class GameController implements GameContext{
         } catch (ClassNotFoundException c) {
             view.showMessage("Save file is corrupted or incompatible.");
         }
+    }
+
+    @CommandDef(value = {"score", "stats"}, description = "Show exploration stats", consumesTurn = false)
+    public void showStats(Command command) {
+        int visited = player.getVisitedRoomCount();
+        int total = (allRooms != null) ? allRooms.size() : 0;
+        
+        view.showMessage("--- Player Statistics ---");
+        view.showMessage("Rooms Explored: " + visited + " / " + total);
+        view.showMessage("Turns Taken: " + turnManager.getTurnCount());
     }
     
     private void showRegionTransition(Region from, Region to) {

@@ -1,20 +1,26 @@
 package model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
-import model.rooms.*;
-import model.items.*;
+import java.util.Set;
+
+import model.items.Item;
+import model.rooms.Room;
 
 
 public class Character implements Serializable{
     private final String name;
     private Room currentRoom;
     private ItemContainer<Item> inventory;
+    private Set<String> visitedRoomIds; 
 
     public Character(String name, Room startingRoom) {
         this.name = name;
         this.currentRoom = startingRoom;
         this.inventory = new ItemContainer<>();
+        this.visitedRoomIds = new HashSet<>();
+        recordVisit(startingRoom);
     }
 
     public String getName() {
@@ -27,6 +33,14 @@ public class Character implements Serializable{
 
     public void setCurrentRoom(Room room) {
         this.currentRoom = room;
+    }
+
+    public void recordVisit(Room room) {
+        this.visitedRoomIds.add(room.getId());
+    }
+
+    public int getVisitedRoomCount() {
+        return this.visitedRoomIds.size();
     }
 
     public void addItem(Item item) throws InventoryFullException{
