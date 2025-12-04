@@ -13,6 +13,7 @@
     {
       "id": "room_staff_alley",
       "name": "Staff Alley",
+      "type": "SPINNER",
       "description": "You are in the narrow staff alley behind the takeaway. Bins, crates, and the smell of old chips.",
       "exits": {
         "north": "room_takeaway_front",

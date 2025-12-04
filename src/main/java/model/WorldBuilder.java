@@ -21,6 +21,12 @@ public class WorldBuilder {
     private List<NPC> npcs = new ArrayList<>();
     private String startingRoomId;
 
+    private enum RoomType {
+        NORMAL,
+        SPINNER,
+        END
+    }
+
     public Room load(String fileName) {
         try {
             //first, load as JSON from the expected patho
@@ -38,7 +44,19 @@ public class WorldBuilder {
             // rooms all have to be created before exits can be set or we get null pointerss
             for (int i = 0; i < roomsArray.length(); i++) {
                 JSONObject rJson = roomsArray.getJSONObject(i);
-                Room room = new Room(rJson.getString("id"), rJson.getString("name"), rJson.getString("description"));
+
+                RoomType roomType = RoomType.NORMAL;
+                if (rJson.has("type")) {
+                    roomType = rJson.getEnum(RoomType.class, "type");
+                }
+                Room room;
+                if (roomType == RoomType.SPINNER) {
+                    room = new SpinnerRoom(rJson.getString("id"), rJson.getString("name"), rJson.getString("description"));
+                } else if (roomType == RoomType.END) {
+                    room = new EndRoom(rJson.getString("id"), rJson.getString("name"), rJson.getString("description"));
+                } else {
+                    room = new Room(rJson.getString("id"), rJson.getString("name"), rJson.getString("description"));
+                }
                 
                 if (rJson.has("items")) {
                         JSONArray items = rJson.getJSONArray("items");
@@ -49,6 +67,7 @@ public class WorldBuilder {
                         String name = iJson.getString("name");
                         String desc = iJson.getString("desc");
                         boolean isPortable = iJson.optBoolean("portable", true);
+
                         
                         // Get type, default to GENERIC if missing
                         ItemType type = ItemType.GENERIC;
